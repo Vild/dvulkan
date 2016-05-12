@@ -815,26 +815,28 @@ struct DVulkanLoader {
 version(DVulkanLoadFromDerelict) {
 	import derelict.util.loader;
 	import derelict.util.system;
-	
+
 	private {
 		version(Windows)
 			enum libNames = "vulkan-1.dll";
+		else version(linux)
+			enum libNames = "libvulkan.so.1";
 		else
 			static assert(0,"Need to implement Vulkan libNames for this operating system.");
 	}
-	
+
 	class DVulkanDerelictLoader : SharedLibLoader {
 		this() {
 			super(libNames);
 		}
-		
+
 		protected override void loadSymbols() {
 			typeof(vkGetInstanceProcAddr) getProcAddr;
 			bindFunc(cast(void**)&getProcAddr, "vkGetInstanceProcAddr");
 			DVulkanLoader.loadGlobalLevelFunctions(getProcAddr);
 		}
 	}
-	
+
 	__gshared DVulkanDerelictLoader DVulkanDerelict;
 
 	shared static this() {
